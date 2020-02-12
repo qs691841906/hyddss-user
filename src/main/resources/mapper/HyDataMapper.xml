@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sinosoft.ddss.dao.HyDataMapper">
+  <resultMap id="BaseResultMap" type="com.sinosoft.ddss.common.entity.HyData">
+    <id column="id" property="id" />
+    <result column="pid" property="pid" />
+    <result column="name" property="name" />
+    <result column="enname" property="enname" />
+    <result column="datatype" property="datatype" />
+    <result column="isdelete" property="isdelete" />
+    <result column="satellite" property="satellite" />
+    <result column="sersor" property="sersor" />
+    <result column="productLevel" property="productLevel" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, pid, name, enname
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ddss_hy_data
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from ddss_hy_data
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.sinosoft.ddss.common.entity.HyData">
+    insert into ddss_hy_data (id, pid, name, 
+      enname)
+    values (#{id,jdbcType=INTEGER}, #{pid,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, 
+      #{enname,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.sinosoft.ddss.common.entity.HyData">
+    insert into ddss_hy_data
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="pid != null">
+        pid,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="enname != null">
+        enname,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="pid != null">
+        #{pid,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="enname != null">
+        #{enname,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.sinosoft.ddss.common.entity.HyData">
+    update ddss_hy_data
+    <set>
+      <if test="pid != null">
+        pid = #{pid,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="enname != null">
+        enname = #{enname,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sinosoft.ddss.common.entity.HyData">
+    update ddss_hy_data
+    set pid = #{pid,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      enname = #{enname,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!-- 根据pid查询卫星传感器级别 -->
+  <select id="selectData" resultMap="BaseResultMap" parameterType="com.sinosoft.ddss.common.entity.HyData">
+  	select 
+  	<include refid="Base_Column_List" />
+  	from ddss_hy_data where pid in (#{pid})
+  </select>
+  <!-- 获取所有卫星传感器级别 -->
+  <select id="selectDataList" resultType="java.util.HashMap">
+  	SELECT 
+			a.name AS satellite,b.name AS sersor,c.name AS productLevel
+			FROM ddss_hy_data AS a 
+			       left JOIN 
+					 ddss_hy_data AS b ON a.id=b.pid	
+				   left JOIN 
+					 ddss_hy_data AS c ON b.id=c.pid
+			WHERE a.pid =0 
+  </select>
+  <!-- 获取所有级别 -->
+  <select id="selectLevelList" resultMap="BaseResultMap">
+  	SELECT DISTINCT name from ddss_hy_data where datatype=3 AND isdelete=0
+  </select>
+  <!-- 根据级别获取卫星传感器 -->
+  <select id="selectLevelNode" resultMap="BaseResultMap" parameterType="com.sinosoft.ddss.common.entity.HyData">
+				
+				SELECT	t1.ID,		
+			t1. NAME	AS satellite,
+		array_to_string(ARRAY(SELECT unnest(array_agg(t2.NAME)) ),',') AS sersor ,t3.name AS productLevel
+				FROM
+					ddss_hy_data t1,
+					ddss_hy_data t2,
+					ddss_hy_data t3
+				WHERE
+					t3.pid = t2.ID
+				AND t2.pid = t1.ID
+				AND t3.NAME = #{name}
+				AND t3.datatype = 3
+				AND t3.isdelete=0
+		GROUP BY t1. ID,satellite,t3.name
+  </select>
+</mapper>

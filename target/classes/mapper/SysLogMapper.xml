@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sinosoft.ddss.dao.SysLogMapper">
+  <resultMap id="BaseResultMap" type="com.sinosoft.ddss.common.entity.SysLog">
+    <id column="id" property="id" />
+    <result column="log_type" property="logType" />
+    <result column="description" property="description" />
+    <result column="log_level" property="logLevel" />
+    <result column="fault_code" property="faultCode" />
+    <result column="founder" property="founder" />
+    <result column="create_time" property="createTime" />
+    <result column="update_time" property="updateTime" />
+    <result column="ip" property="ip" />
+    <result column="method_name" property="methodName" />
+    <result column="params" property="params" />
+    <result column="class_name" property="className" />
+    <result column="message" property="message" />
+  </resultMap>
+  <sql id="Base_Column_List">
+  	id, log_type, description, log_level, fault_code, founder, to_char(create_time, 'yyyy/MM/dd HH24:mi:ss') create_time, to_char(update_time, 'yyyy/MM/dd HH24:mi:ss') update_time, 
+    ip, method_name, params, class_name, message
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.math.BigDecimal" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ddss_sys_log
+    where id = #{id,jdbcType=NUMERIC}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.math.BigDecimal">
+    delete from ddss_sys_log
+    where id = #{id,jdbcType=NUMERIC}
+  </delete>
+  <insert id="insert" parameterType="com.sinosoft.ddss.common.entity.SysLog">
+    insert into ddss_sys_log (id, log_type, description, 
+      log_level, fauit_code, founder, 
+      create_time, update_time)
+    values (#{id}, #{logType}, #{description}, 
+      #{logLevel}, #{fauitCode}, #{founder}, 
+      #{createTime}, #{updateTime})
+  </insert>
+  <insert id="insertSelective" parameterType="com.sinosoft.ddss.common.entity.SysLog">
+    insert into ddss_sys_log
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        id,
+      <if test="logType != null">
+        log_type,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="logLevel != null">
+        log_level,
+      </if>
+      <if test="faultCode != null">
+        fault_code,
+      </if>
+      <if test="founder != null">
+        founder,
+      </if>
+      <if test="ip != null">
+        ip,
+      </if>
+      <if test="methodName != null">
+        method_name,
+      </if>
+      <if test="params != null">
+        params,
+      </if>
+      <if test="className != null">
+        class_name,
+      </if>
+      <if test="message != null">
+        message,
+      </if>
+        create_time,
+        update_time,
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      nextval('ddss_sys_log_seq'),
+      <if test="logType != null and logType != ''">
+        #{logType},
+      </if>
+      <if test="description != null and description != ''">
+        #{description},
+      </if>
+      <if test="logLevel != null">
+        #{logLevel},
+      </if>
+      <if test="faultCode != null">
+        #{faultCode},
+      </if>
+      <if test="founder != null and founder != ''">
+        #{founder},
+      </if>
+      <if test="ip != null and ip != ''">
+        #{ip},
+      </if>
+      <if test="methodName != null and methodName != ''">
+        #{methodName},
+      </if>
+      <if test="params != null and params != ''">
+        #{params},
+      </if>
+      <if test="className != null and className != ''">
+        #{className},
+      </if>
+      <if test="message != null and message != ''">
+        #{message},
+      </if>
+      now(),
+      now()
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.sinosoft.ddss.common.entity.SysLog">
+    update ddss_sys_log
+    <set>
+      <if test="logType != null">
+        log_type = #{logType},
+      </if>
+      <if test="description != null">
+        description = #{description},
+      </if>
+      <if test="logLevel != null">
+        log_level = #{logLevel},
+      </if>
+      <if test="fauitCode != null">
+        fauit_code = #{fauitCode},
+      </if>
+      <if test="founder != null">
+        founder = #{founder},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sinosoft.ddss.common.entity.SysLog">
+  
+    update ddss_sys_log
+    set log_type = #{logType},
+      description = #{description},
+      log_level = #{logLevel},
+      fauit_code = #{fauitCode},
+      founder = #{founder},
+      create_time = #{createTime},
+      update_time = #{updateTime}
+    where id = #{id}
+  </update>
+  
+  
+  <select id="listLog" resultMap="BaseResultMap" parameterType="com.sinosoft.ddss.common.entity.query.SysLogQuery">
+		select
+		<include refid="Base_Column_List" />
+		from ddss_sys_log
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+		    <if test="logLevel != null and logLevel != ''">
+				AND log_level = #{logLevel}
+			</if>
+			<if test="startTime != null and startTime != ''">
+			AND to_timestamp(#{startTime}, 'yyyy-mm-dd HH24:mi:ss') &lt;=
+			create_time
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND to_timestamp(#{endTime}, 'yyyy-mm-dd HH24:mi:ss') &gt;=
+				create_time
+			</if>
+	    </trim>
+	    	<choose>
+				<when test="sortBy != null and sortBy != ''">
+					<if test="sortType == 1">
+						ORDER BY id ASC
+					</if>
+					<if test="sortType != 2">
+						ORDER BY id DESC
+					</if>
+				</when>
+				<otherwise>
+					ORDER BY id DESC
+				</otherwise>
+			</choose>
+	    <if	test="startNum != null and startNum >= 0 and pageSize != null and pageSize > 0">
+			<![CDATA[ limit #{pageSize} offset #{startNum} ]]> 
+		</if>
+  </select>
+  
+  <select id="countLog" parameterType="com.sinosoft.ddss.common.entity.query.SysLogQuery" resultType="java.lang.Integer">
+  	 select 
+    count(1)
+    from ddss_sys_log
+    <trim prefix="WHERE" prefixOverrides="AND | OR">
+   		<if test="logLevel != null and logLevel != ''">
+			AND log_level = #{logLevel}
+		</if>
+		<if test="startTime != null and startTime != ''">
+		AND to_timestamp(#{startTime}, 'yyyy-mm-dd HH24:mi:ss') &lt;=
+		create_time
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND to_timestamp(#{endTime}, 'yyyy-mm-dd HH24:mi:ss') &gt;=
+			create_time
+		</if>
+    </trim>
+  </select>
+  <select id="listLogByIds" resultMap="BaseResultMap" parameterType="com.sinosoft.ddss.common.entity.SysLog">
+	SELECT
+	<include refid="Base_Column_List"/>
+	FROM
+	ddss_sys_log
+	WHERE
+	ID IN (${ids})
+  </select>
+</mapper>

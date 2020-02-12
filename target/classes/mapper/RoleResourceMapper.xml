@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sinosoft.ddss.dao.RoleResourceMapper">
+  <resultMap id="BaseResultMap" type="com.sinosoft.ddss.common.entity.RoleResource">
+    <id column="id"  property="id" />
+    <result column="role_id"  property="roleId" />
+    <result column="resource_id" property="resourceId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, role_id, resource_id
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.math.BigDecimal" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ddss_sys_role_resource
+    where id = #{id}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.math.BigDecimal">
+    delete from ddss_sys_role_resource
+    where id = #{id}
+  </delete>
+  <insert id="insertSelective" parameterType="com.sinosoft.ddss.common.entity.RoleResource">
+    insert into ddss_sys_role_resource
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        id,
+      <if test="roleId != null">
+        role_id,
+      </if>
+      <if test="resourceId != null">
+        resource_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id},
+      </if>
+      <if test="roleId != null">
+        #{roleId},
+      </if>
+      <if test="resourceId != null">
+        #{resourceId},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.sinosoft.ddss.common.entity.RoleResource">
+    update ddss_sys_role_resource
+    <set>
+      <if test="roleId != null">
+        role_id = #{roleId},
+      </if>
+      <if test="resourceId != null">
+        resource_id = #{resourceId},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+  <!-- 根据角色id集合获取系统角色资源信息 -->
+	<select id="getRoleResourceInfoByRoleIdList" resultMap="BaseResultMap" parameterType="java.util.List">
+		SELECT 
+			<include refid="Base_Column_List"/> 
+		FROM 
+			ddss_sys_role_resource
+		WHERE role_id IN
+			<foreach collection="list" item="resource_id"
+				open="(" separator="," close=")">
+				#{resource_id}
+			</foreach> 
+		ORDER BY resource_id ASC
+	</select>
+	<delete id="deleteByRoleId">
+		delete from ddss_sys_role_resource
+    	where role_id = #{arg0}
+	</delete>
+	
+	<select id="getCountByRoleId" resultType="java.lang.Integer">
+		SELECT 
+			count(1)
+		FROM 
+			ddss_sys_role_resource
+		WHERE role_id = #{arg0}
+	</select>
+	<insert id="insertRoleResourceByList" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">  
+		insert into ddss_sys_role_resource (id,role_id,resource_id)
+		values
+            (nextval('ddss_sys_rolesource_seq'),#{item.roleId},#{item.resourceId})  
+        </foreach>
+	</insert>
+</mapper>

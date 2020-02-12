@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sinosoft.ddss.dataDao.GeoMapper">
+	<resultMap id="ResultPlaceMap" type="com.sinosoft.ddss.model.Place">
+			<result column="gid"  property="gid" />
+			<result column="objectid"  property="objectid" />
+			<result column="name_chn" property="namechn" />
+			<result column="code" property="code" />
+			<result column="name_eng" property="nameeng" />
+	</resultMap>
+
+	<sql id="BasePlace">
+		gid,objectid,name_chn,code,name_eng
+	</sql>
+	<sql id="BasePlace2">
+		gid,objectid,name_chn,name_eng
+	</sql>
+	
+ 	<select id="getPlaceByCode" resultMap="ResultPlaceMap">
+		SELECT
+		<choose>
+			<when test="_parameter=='world'">
+				<include refid="BasePlace2" />
+			</when>
+			<otherwise>
+				<include refid="BasePlace" />
+			</otherwise>
+		</choose>
+		FROM
+		<choose>
+			<when test="_parameter=='city'">
+				city D
+			</when>
+			<when test="_parameter=='town'">
+				town D
+			</when>
+			<when test="_parameter=='province'">
+				province D
+			</when>
+			<when test="_parameter=='world'">
+				world D
+			</when>
+			<otherwise>
+				province D
+			</otherwise>
+		</choose>
+	</select>
+</mapper>
